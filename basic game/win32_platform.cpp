@@ -1,13 +1,19 @@
+#include "renderer.cpp"
+
 #include <windows.h>
 
 // Global variables to keep track of the running state of the program
 bool running = true;
 
 // Buffer variables for storing pixel data
-void* buffermemory;
-int bufferwidth;
-int bufferheight;
-BITMAPINFO bufferbitmapinfo;
+
+struct Render_State {
+    int width, height;
+    void* memory;
+    BITMAPINFO bit_map_info;
+};
+
+Render_State rander_state;
 
 // Window callback function to handle window messages
 LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
@@ -24,24 +30,24 @@ LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
         // Handle window resizing by updating buffer dimensions
         RECT rect;
         GetClientRect(hWnd, &rect);
-        bufferwidth = rect.right - rect.left;
-        bufferheight = rect.bottom - rect.top;
+        rander_state.width = rect.right - rect.left;
+        rander_state.height = rect.bottom - rect.top;
 
         // Allocate memory for the buffer
-        int buffersize = bufferwidth * bufferheight * sizeof(unsigned int);
+        int buffersize = rander_state.width * rander_state.height * sizeof(unsigned int);
 
         // If there is existing buffer memory, free it before allocating new memory
-        if (buffermemory) VirtualFree(buffermemory, 0, MEM_RELEASE);
+        if (rander_state.memory) VirtualFree(rander_state.memory, 0, MEM_RELEASE);
 
         // Allocate new buffer memory
-        buffermemory = VirtualAlloc(0, buffersize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        rander_state.memory = VirtualAlloc(0, buffersize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-        bufferbitmapinfo.bmiHeader.biSize = sizeof(bufferbitmapinfo.bmiHeader);
-        bufferbitmapinfo.bmiHeader.biWidth = bufferwidth;
-        bufferbitmapinfo.bmiHeader.biHeight = bufferheight;
-        bufferbitmapinfo.bmiHeader.biPlanes = 1;
-        bufferbitmapinfo.bmiHeader.biBitCount = 32;
-        bufferbitmapinfo.bmiHeader.biCompression = BI_RGB;
+        rander_state.bit_map_info.bmiHeader.biSize = sizeof(rander_state.bit_map_info.bmiHeader);
+        rander_state.bit_map_info.bmiHeader.biWidth = rander_state.width;
+        rander_state.bit_map_info.bmiHeader.biHeight = rander_state.height;
+        rander_state.bit_map_info.bmiHeader.biPlanes = 1;
+        rander_state.bit_map_info.bmiHeader.biBitCount = 32;
+        rander_state.bit_map_info.bmiHeader.biCompression = BI_RGB;
 
     } break;
 
@@ -86,17 +92,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         }
 
         // Simulate and update game logic here
-
-
-        unsigned int* pixel = (unsigned int*)buffermemory;
-        for (int y = 0; y < bufferheight; y++) {
-            for (int x = 0; x < bufferwidth; x++){
-                *pixel++ = x*y;
-            }
-        }
-
+        clear_screen(0xff5500);
+        draw_rect(50, 50, 200, 500, 0xff0000);
         // Running loop continues until the window is closed
-        StretchDIBits(hdc, 0, 0, bufferwidth, bufferheight, 0, 0, bufferwidth, bufferheight, buffermemory, &bufferbitmapinfo, DIB_RGB_COLORS, SRCCOPY);
+        StretchDIBits(hdc, 0, 0, rander_state.width, rander_state.height, 0, 0, rander_state.width, rander_state.height, rander_state.memory, &rander_state.bit_map_info, DIB_RGB_COLORS, SRCCOPY);
 
     }
 
