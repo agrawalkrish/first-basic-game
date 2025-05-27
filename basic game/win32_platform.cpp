@@ -1,72 +1,86 @@
-#include<windows.h>
+#include <windows.h>
 
-
+// Global variables to keep track of the running state of the program
 bool running = true;
+
+// Buffer variables for storing pixel data
+void* buffermemory;
 int bufferwidth;
 int bufferheight;
 
 
+// Window callback function to handle window messages
 LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
-	LRESULT result = 0;
-	switch (Msg) {
-		case WM_CLOSE:
-		case WM_DESTROY: {
-			running = false;
-		}break;
-		case WM_SIZE: {
-			RECT rect;
-			GetClientRect(hWnd, &rect);
-			int width = rect.right - rect.left;
-			int height = rect.bottom - rect.top;
+    LRESULT result = 0;
 
-			int buffersize = width * height * sizeof(unsigned int);
-			memory = VirtualAlloc(0, buffersize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-		}break;
-		//case:
+    switch (Msg) {
+    case WM_CLOSE:
+    case WM_DESTROY: {
+        // When the window is closed or destroyed, stop running the program
+        running = false;
+    } break;
 
-		default: {
-			result = DefWindowProc(hWnd, Msg, wParam, lParam);
-		}
+    case WM_SIZE: {
+        // Handle window resizing by updating buffer dimensions
+        RECT rect;
+        GetClientRect(hWnd, &rect);
+        bufferwidth = rect.right - rect.left;
+        bufferheight = rect.bottom - rect.top;
 
+        // Allocate memory for the buffer
+        int buffersize = bufferwidth * bufferheight * sizeof(unsigned int);
 
-	}
-	return result;
+        // If there is existing buffer memory, free it before allocating new memory
+        if (buffermemory) VirtualFree(buffermemory, 0, MEM_RELEASE);
+
+        // Allocate new buffer memory
+        buffermemory = VirtualAlloc(0, buffersize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    } break;
+
+    default: {
+        // For any other messages, use the default window procedure
+        result = DefWindowProc(hWnd, Msg, wParam, lParam);
+    }
+    }
+
+    return result;
 }
 
-//ATOM RegisterClass(const WNDCLASSA* lpWndClass );
-
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
-	// create window class 
-	WNDCLASS Window_class = {};
-	Window_class.style = CS_HREDRAW | CS_VREDRAW;
-	Window_class.lpszClassName = L"Game Window Class";
-	Window_class.lpfnWndProc = window_callback;
+    // Create and configure a window class
+    WNDCLASS Window_class = {};
+    Window_class.style = CS_HREDRAW | CS_VREDRAW; // Redraw on horizontal/vertical resizing
+    Window_class.lpszClassName = L"Game Window Class"; // Window class name
+    Window_class.lpfnWndProc = window_callback; // Pointer to window callback function
 
+    // Register the window class
+    RegisterClass(&Window_class);
 
-	// register class
-	RegisterClass(&Window_class);
+    // Create the window with defined attributes
+    HWND window = CreateWindow(
+        Window_class.lpszClassName, L"My First Game!",
+        WS_OVERLAPPEDWINDOW | WS_VISIBLE, // Window style with visibility
+        CW_USEDEFAULT, CW_USEDEFAULT, // Default position
+        1280, 720, // Window dimensions
+        0, 0, // Parent and menu handles (none)
+        hInstance, // Application instance handle
+        0 // Additional parameters (none)
+    );
 
+    // Main game loop: Continually processes messages and keeps program running
+    while (running) {
+        MSG message;
 
-	// create windows
+        // Process any messages for the window
+        while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&message);
+            DispatchMessageW(&message);
+        }
 
-	HWND window= CreateWindow(
-		Window_class.lpszClassName, L"My First game!", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, 0, 0, hInstance, 0
-	);
+        // Simulate and update game logic here
 
-	while (running) {
-		// input 
-		MSG message;
-		while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&message);
-			DispatchMessageW(&message);
-		}
+        // Running loop continues until the window is closed
+    }
 
-		//simulate
-		
-
-		//running
-
-
-	}
-
+    return 0;
 }
