@@ -7,11 +7,11 @@ bool running = true;
 
 // Buffer variables for storing pixel data
 
-struct Render_State {
-    int width, height;
-    void* memory;
-    BITMAPINFO bit_map_info;
-};
+// struct Render_State {
+//     int width, height;
+//     void* memory;
+//     BITMAPINFO bit_map_info;
+// };
 
 Render_State rander_state;
 
@@ -92,8 +92,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         }
 
         // Simulate and update game logic here
-        clear_screen(0xff5500);
-        draw_rect(50, 50, 200, 500, 0xff0000);
+
+        clear_screen(rander_state, 0xff5500);
+        draw_rect(rander_state, 50, 50, 200, 500, 0xff0000);
         // Running loop continues until the window is closed
         StretchDIBits(hdc, 0, 0, rander_state.width, rander_state.height, 0, 0, rander_state.width, rander_state.height, rander_state.memory, &rander_state.bit_map_info, DIB_RGB_COLORS, SRCCOPY);
 
