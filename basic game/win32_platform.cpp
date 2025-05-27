@@ -1,10 +1,25 @@
 #include<windows.h>
 
+
+bool running = true;
 LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
-	return DefWindowProc(hWnd, Msg, wParam, lParam);
+	LRESULT result = 0;
+	switch (Msg) {
+		case WM_CLOSE:
+		case WM_DESTROY: {
+			running = false;
+		}break;
+
+		default: {
+			result = DefWindowProc(hWnd, Msg, wParam, lParam);
+		}
+
+
+	}
+	return result;
 }
 
-ATOM RegisterClass(const WNDCLASSA* lpWndClass );
+//ATOM RegisterClass(const WNDCLASSA* lpWndClass );
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	// create window class 
@@ -20,10 +35,24 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	// create windows
 
-	CreateWindow(
+	HWND window= CreateWindow(
 		Window_class.lpszClassName, L"My First game!", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, 0, 0, hInstance, 0
 	);
 
+	while (running) {
+		// input 
+		MSG message;
+		while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&message);
+			DispatchMessageW(&message);
+		}
 
+		//simulate
+		
+
+		//running
+
+
+	}
 
 }
