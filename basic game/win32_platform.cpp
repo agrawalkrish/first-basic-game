@@ -7,7 +7,7 @@ bool running = true;
 void* buffermemory;
 int bufferwidth;
 int bufferheight;
-
+BITMAPINFO bufferbitmapinfo;
 
 // Window callback function to handle window messages
 LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
@@ -35,6 +35,14 @@ LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 
         // Allocate new buffer memory
         buffermemory = VirtualAlloc(0, buffersize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+        bufferbitmapinfo.bmiHeader.biSize = sizeof(bufferbitmapinfo.bmiHeader);
+        bufferbitmapinfo.bmiHeader.biWidth = bufferwidth;
+        bufferbitmapinfo.bmiHeader.biHeight = bufferheight;
+        bufferbitmapinfo.bmiHeader.biPlanes = 1;
+        bufferbitmapinfo.bmiHeader.biBitCount = 32;
+        bufferbitmapinfo.bmiHeader.biCompression = BI_RGB;
+
     } break;
 
     default: {
@@ -70,7 +78,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     // Main game loop: Continually processes messages and keeps program running
     while (running) {
         MSG message;
-
+        HDC hdc = GetDC(window);
         // Process any messages for the window
         while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
             TranslateMessage(&message);
@@ -79,7 +87,17 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
         // Simulate and update game logic here
 
+
+        unsigned int* pixel = (unsigned int*)buffermemory;
+        for (int y = 0; y < bufferheight; y++) {
+            for (int x = 0; x < bufferwidth; x++){
+                *pixel++ = x*y;
+            }
+        }
+
         // Running loop continues until the window is closed
+        StretchDIBits(hdc, 0, 0, bufferwidth, bufferheight, 0, 0, bufferwidth, bufferheight, buffermemory, &bufferbitmapinfo, DIB_RGB_COLORS, SRCCOPY);
+
     }
 
     return 0;
