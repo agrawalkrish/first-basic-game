@@ -2,6 +2,10 @@
 
 
 bool running = true;
+int bufferwidth;
+int bufferheight;
+
+
 LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
 	LRESULT result = 0;
 	switch (Msg) {
@@ -9,6 +13,16 @@ LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 		case WM_DESTROY: {
 			running = false;
 		}break;
+		case WM_SIZE: {
+			RECT rect;
+			GetClientRect(hWnd, &rect);
+			int width = rect.right - rect.left;
+			int height = rect.bottom - rect.top;
+
+			int buffersize = width * height * sizeof(unsigned int);
+			memory = VirtualAlloc(0, buffersize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		}break;
+		//case:
 
 		default: {
 			result = DefWindowProc(hWnd, Msg, wParam, lParam);
