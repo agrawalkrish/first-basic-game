@@ -1,19 +1,28 @@
-#include "renderer.cpp"
-
+#include "utils.cpp"
 #include <windows.h>
 
 // Global variables to keep track of the running state of the program
-bool running = true;
+global_variable bool running = true;
 
 // Buffer variables for storing pixel data
 
-// struct Render_State {
-//     int width, height;
-//     void* memory;
-//     BITMAPINFO bit_map_info;
-// };
+struct Render_State {
+     int width, height;
+    void* memory;
+     BITMAPINFO bit_map_info;
+};
 
-Render_State rander_state;
+global_variable Render_State rander_state;
+
+
+
+
+#include "platform_common.cpp"
+#include "renderer.cpp"
+#include"game_file.cpp"
+
+
+
 
 // Window callback function to handle window messages
 LRESULT CALLBACK window_callback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
@@ -82,19 +91,48 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     );
 
     // Main game loop: Continually processes messages and keeps program running
+
+
+    Input input = {};
+
+        
     while (running) {
         MSG message;
         HDC hdc = GetDC(window);
         // Process any messages for the window
+
+        for (int i=0; i<BUTTON_COUNT; i++){
+            input.buttons[i].changed = false;
+        }
+
         while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&message);
-            DispatchMessageW(&message);
+            switch (message.message) {
+            case WM_KEYUP:
+            case WM_KEYDOWN: {
+                u32 vk_code = (u32)message.wParam;
+                bool is_down = ((message.lParam & (1 << 31)) == 0);
+
+                switch (vk_code) {
+                case VK_UP: {
+                    input.buttons[BUTTON_UP].is_down = is_down;
+                    input.buttons[BUTTON_UP].changed = true;
+                    
+                }
+                }
+            }break;
+            default: {
+                TranslateMessage(&message);
+                DispatchMessageW(&message);
+            }
+
+            }
+            
         }
 
         // Simulate and update game logic here
+        simulate_game(input);
 
-        clear_screen(rander_state, 0xff5500);
-        draw_rect(rander_state, 50, 50, 200, 500, 0xff0000);
+
         // Running loop continues until the window is closed
         StretchDIBits(hdc, 0, 0, rander_state.width, rander_state.height, 0, 0, rander_state.width, rander_state.height, rander_state.memory, &rander_state.bit_map_info, DIB_RGB_COLORS, SRCCOPY);
 
