@@ -96,6 +96,18 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     // Main game loop: Continuously processes messages and keeps the program running  
     Input input = {};
 
+    float delta_time = 0.016666f;
+
+    LARGE_INTEGER frame_begin_time;
+    QueryPerformanceCounter(&frame_begin_time);
+
+    float performance_frequency;
+    {
+        LARGE_INTEGER perf;
+        QueryPerformanceFrequency(&perf);
+        performance_frequency = (float)(perf.QuadPart);
+    }
+
     while (running) {
         MSG message;
         HDC hdc = GetDC(window); // Retrieve the device context for rendering  
@@ -113,12 +125,17 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
                 u32 vk_code = (u32)message.wParam;
                 bool is_down = ((message.lParam & (1 << 31)) == 0);
 
+#define process_button(b,vk)\
+case vk: {\
+input.buttons[b].is_down = is_down;\
+input.buttons[b].changed = true;\
+}break;\
                 // Handle specific key press inputs  
                 switch (vk_code) {
-                case VK_UP: {
-                    input.buttons[BUTTON_UP].is_down = is_down;
-                    input.buttons[BUTTON_UP].changed = true;
-                }
+                    process_button(BUTTON_UP, VK_UP);
+                    process_button(BUTTON_DOWN, VK_DOWN);
+                    process_button(BUTTON_LEFT, VK_LEFT);
+                    process_button(BUTTON_RIGHT, VK_RIGHT);
                 }
             } break;
             default: {
@@ -130,13 +147,19 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         }
 
         // Simulate and update game logic  
-        simulate_game(input);
+        simulate_game(&input, delta_time);
 
         // Render the updated game screen  
         StretchDIBits(hdc, 0, 0, rander_state.width, rander_state.height,
             0, 0, rander_state.width, rander_state.height,
             rander_state.memory, &rander_state.bit_map_info,
             DIB_RGB_COLORS, SRCCOPY);
+
+        LARGE_INTEGER frame_end_time;
+        QueryPerformanceCounter(&frame_end_time);
+
+        delta_time = (float) (frame_end_time.QuadPart - frame_begin_time.QuadPart)  / performance_frequency;
+        frame_begin_time = frame_end_time;
     }
 
     return 0;
