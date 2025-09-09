@@ -132,13 +132,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
                 u32 vk_code = (u32)message.wParam;
                 bool is_down = ((message.lParam & (1 << 31)) == 0);
 
-#define process_button(b, vk)                                           \
-    case vk:                                                            \
-    {                                                                   \
-        input.buttons[b].changed = is_down != input.buttons[b].is_down; \
-        input.buttons[b].is_down = is_down;                             \
-    }                                                                   \
-    break;                                                              \
+#define process_button(b, vk)\
+case vk:\
+{\
+input.buttons[b].changed = is_down != input.buttons[b].is_down;\
+input.buttons[b].is_down = is_down;\
+}\
+break;\
                 // Handle specific key press inputs
                 switch (vk_code)
                 {
