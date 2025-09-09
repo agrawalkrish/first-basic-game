@@ -12,7 +12,8 @@ enum
     BUTTON_DOWN,    // Represents the "Down" button  
     BUTTON_LEFT,    // Represents the "Left" button  
     BUTTON_RIGHT,   // Represents the "Right" button  
-
+    BUTTON_W,        // Represents the "W" button
+    BUTTON_S,        // Represents the "S" button
     BUTTON_COUNT    // Ensures this is always the last entry to specify the total button count  
 };
 
