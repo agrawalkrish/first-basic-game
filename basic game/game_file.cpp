@@ -49,16 +49,22 @@ internal void simulate_game(Input* input, float dt)
     draw_rect(0, 0, arena_half_size_x, arena_half_size_y, 0xffaa33); // Main playfield
 
     // Player 1 input and physics
-    float player_1_ddp = 0;
+    float player_1_ddp = 0.f;
+#if 0
     if (is_down(BUTTON_UP))
         player_1_ddp += 2000;
     if (is_down(BUTTON_DOWN))
         player_1_ddp -= 2000;
-
+#else 
+    
+    player_1_ddp = (ball_p_y - player_1_p) * 100;
+    if (player_1_ddp > 1300)player_1_ddp = 1300;
+    if (player_1_ddp < -1300)player_1_ddp = -1300;
+#endif
     simulate_player(&player_1_p, &player_1_dp, player_1_ddp, dt);
 
     // Player 2 input and physics
-    float player_2_ddp = 0;
+    float player_2_ddp = 0.f;
     if (is_down(BUTTON_W))
         player_2_ddp += 2000;
     if (is_down(BUTTON_S))
