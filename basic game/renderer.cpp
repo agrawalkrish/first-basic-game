@@ -60,3 +60,89 @@ draw_rect(float x, float y, float halfSize_x, float halfSize_y, u32 color)
     // Draw the rectangle using pixel coordinates
     draw_rect_inpixel(x0, y0, x1, y1, color);
 }
+
+internal void draw_number(int number, float x, float y, float size, u32 color) {
+    float half_size = size * .5f;
+    float full_height = size * 2.5f;
+    float half_height = size * 1.25f;
+    float digit_width = 4 * size;
+
+    do {
+        int digit = number % 10;
+        number /= 10;
+
+        switch (digit) {
+        case 0: {
+            draw_rect(x - size, y, half_size, full_height, color);
+            draw_rect(x + size, y, half_size, full_height, color);
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x, y - full_height, size, half_size, color);
+        } break;
+
+        case 1: {
+            draw_rect(x + size, y, half_size, full_height, color);
+        } break;
+
+        case 2: {
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x, y, size, half_size, color);
+            draw_rect(x, y - full_height, size, half_size, color);
+            draw_rect(x + size, y + half_height, half_size, half_height, color);
+            draw_rect(x - size, y - half_height, half_size, half_height, color);
+        } break;
+
+        case 3: {
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x, y, size, half_size, color);
+            draw_rect(x, y - full_height, size, half_size, color);
+            draw_rect(x + size, y, half_size, full_height, color);
+        } break;
+
+        case 4: {
+            draw_rect(x + size, y, half_size, full_height, color);
+            draw_rect(x, y, size, half_size, color);
+            draw_rect(x - size, y + half_height, half_size, half_height, color);
+        } break;
+
+        case 5: {
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x, y, size, half_size, color);
+            draw_rect(x, y - full_height, size, half_size, color);
+            draw_rect(x - size, y + half_height, half_size, half_height, color);
+            draw_rect(x + size, y - half_height, half_size, half_height, color);
+        } break;
+
+        case 6: {
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x, y, size, half_size, color);
+            draw_rect(x, y - full_height, size, half_size, color);
+            draw_rect(x - size, y, half_size, full_height, color);
+            draw_rect(x + size, y - half_height, half_size, half_height, color);
+        } break;
+
+        case 7: {
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x + size, y, half_size, full_height, color);
+        } break;
+
+        case 8: {
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x, y, size, half_size, color);
+            draw_rect(x, y - full_height, size, half_size, color);
+            draw_rect(x - size, y, half_size, full_height, color);
+            draw_rect(x + size, y, half_size, full_height, color);
+        } break;
+
+        case 9: {
+            draw_rect(x, y + full_height, size, half_size, color);
+            draw_rect(x, y, size, half_size, color);
+            draw_rect(x, y - full_height, size, half_size, color);
+            draw_rect(x + size, y, half_size, full_height, color);
+            draw_rect(x - size, y + half_height, half_size, half_height, color);
+        } break;
+        }
+
+        x -= digit_width;
+
+    } while (number);
+}
