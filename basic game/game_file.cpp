@@ -17,8 +17,6 @@ int player_1_score, player_2_score;
 enum GameMode {
     GM_Menu,
     GM_Gameplay,
-
-
 };
 int hot_button = 0;
 bool enemy_is_ai;
@@ -136,8 +134,8 @@ internal void simulate_game(Input* input, float dt)
                 player_2_score++;
             }
         }
-
-
+        
+        
         draw_number(player_1_score, -10, 40, 1.f, 0xbbffbb);
         draw_number(player_2_score, 10, 40, 1.f, 0xbbffbb);
         // Draw everything
@@ -154,14 +152,19 @@ internal void simulate_game(Input* input, float dt)
             current_gamemode = GM_Gameplay;
             enemy_is_ai = hot_button ? 0 : 1;
         }
-        if (hot_button == 0) {
-            draw_rect(20, 0, 10, 10, 0xff0000);
-            draw_rect(-20, 0, 10, 10, 0xcccccc);
+        if (hot_button == 1) {
+            draw_text("MULTI PLAYER", -80, -10, 1, 0xaaaaaa);
+            draw_text("SINGLE PLAYER", 0, -10, 1, 0xff0000);
+            
         }
         else {
-            draw_rect(20, 0, 10, 10, 0xcccccc);
-            draw_rect(-20, 0, 10, 10, 0xff0000);
+            draw_text("MULTI PLAYER", -80, -10, 1, 0xff0000);
+            draw_text("SINGLE PLAYER", 0, -10, 1, 0xaaaaaa);
+            
         }
+
+        draw_text("PING PONG", -50, 40, 2, 0xffffff);
+            
         
     }
 }
